@@ -45,12 +45,12 @@
 
 // get color depending on poverty value
 	function getColor(p) {
-		return p > 200 ? '#800026' :
-				p > 100  ? '#BD0026' :
-				p > 50  ? '#E31A1C' :
-				p > 20   ? '#FD8D3C' :
+		return p > 200 ? '#E31A1C' :
+				p > 100  ? '#FC4E2A' :
+				p > 50  ? '#FD8D3C' :
+				p > 20   ? '#FEB24C' :
 				p > 10   ? '#FED976' :
-						   '#FFEDA0';
+					   '#FFEDA0';
 	}
 
 	function style(feature) {
@@ -210,7 +210,7 @@ legend.addTo(map);
 
 
 			// add a container to control the layers
-			L.control.layers({"CartoDB": CartoDB, "OpenStreetMap": osm}, {"Local CSO Sites": cso_site, "World Vision (Kenya)": wvi, "Safe Shelters": shelters,"Covid Cases": covid}, {position: 'topleft'}).addTo(map);
+			L.control.layers({"CartoDB": CartoDB, "OpenStreetMap": osm}, {"Local CSO Sites": cso_site, "Safe Shelters": shelters,"World Vision (Kenya)": wvi, "Covid Cases": covid}, {position: 'topleft', collapsed: false}).addTo(map);
 		};
 
 
