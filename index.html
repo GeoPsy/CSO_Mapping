@@ -18,6 +18,8 @@
 	<script type="text/javascript" src="data/world_vision.geojson"></script>
 	<script type="text/javascript" src="data/shelters.geojson"></script>
 	<script type="text/javascript" src="data/covid_cases.geojson"></script>
+	<script type="text/javascript" src="data/teen_pregnancy.geojson"></script>
+	<script type="text/javascript" src="data/child_wellbeing.geojson"></script>
 
 
 	<script type="text/javascript">
@@ -131,7 +133,6 @@ legend.addTo(map);
 		+'<b>'+ 'Population: ' + '</b>'+layer.feature.properties.Population+'<br />'
 		+'<b>'+ 'COVID19 Cases: '+ '</b>'+layer.feature.properties.Cases+'<br />'
 		+'<b>'+ 'Cases per 100,000: '+ '</b>'+layer.feature.properties.Cases_per100k
-
 		);
 	});
 
@@ -207,10 +208,114 @@ legend.addTo(map);
 
 			}).addTo(map);
 			
+	//ADDING TEEN PREGNANCY
+	// get color depending on teen pregnancy rate value
+	function getColorP(p) {
+		return p > 30 ? '#ae017e' : //#d7301f
+				p > 20  ? '#f768a1' : //#fc8d59
+				p > 10   ? '#fbb4b9' : //#fdcc8a
+					   '#feebe2';//#fef0d9
+	}
 
+	function styleTeenPregnancy(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.7,
+			interactive: true,
+			fillColor: getColorP(feature.properties.T_Pregnanc)
+		};
+	}
+	// LEGEND FOR TEEN PREGNANCY
+	//Specifying the legend
+var legend1 = L.control({position: 'topright'});
+
+	legend1.onAdd = function (map) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			grades = [5,10, 20, 30],
+			labels = ['<b>Teen Pregnancy</b>'],
+			from, to;
+
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			to = grades[i + 1];
+
+			labels.push(
+				'<i style="background:' + getColorP(from + 1) + '"></i> ' +
+				from + (to ? '&ndash;' + to : '+'));
+		}
+
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+
+legend1.addTo(map);
+	// LEGEND
+	
+		var t_pregnancy = new L.geoJSON(pregnancy, {style: styleTeenPregnancy, onEachFeature: onEachFeature});//.addTo(map);
+        //Add pop ups for the polygos
+		t_pregnancy.eachLayer(function (layer) {
+		layer.bindPopup('<b>'+layer.feature.properties.COUNTY+' County'+'</b><br />'
+		+'<b>'+ 'Teen pregnancy: ' + '</b>'+layer.feature.properties.T_Pregnanc + '% <br />'
+		+'<b>'+ 'Child poverty: ' + '</b>'+layer.feature.properties.C_poverty + '%'
+
+		);
+	});
+	
+			//ADD TEEN PREGNANCY
+			
+
+			//ADD CHILD WELLBEING DATA
+	// get color depending on wellbeing value
+		function getColorW(p){
+	    	return p === 'Moderate' ? '#45ff08'://green
+	    		   p === 'Least'? '#ecfc03': //yellow
+	    		   							'gray';
+	    }
+
+	function styleChildWellbeing(feature) {
+		return {
+			weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.6,
+			interactive: true,
+			fillColor: getColorW(feature.properties.Wellbeing)
+		};
+	}
+	
+	// addingg legend to map (Child Wellbeing index)
+	    var legend2 = L.control({position: 'topright'});
+	    legend2.onAdd = function (map) {
+	    	var div = L.DomUtil.create('div', 'info legend');
+			labels = ['<strong>Child Friendliness</strong>'],
+			categories = ['Least', 'Moderate', 'No data'];
+			
+	    	for (var i=0; i < categories.length; i++){
+	    		div.innerHTML += labels.push('<i style="background:'+getColorW(categories[i])+'"></i>'+(categories[i] ? categories[i] + '': '+'));//try adding class="circle" btw i and style
+			    
+			}
+			div.innerHTML = labels.join('<br>');
+	    	return div;
+			
+	    };	   
+		legend2.addTo(map);
+	
+	var c_wellbeing = new L.geoJSON(wellbeing, {style: styleChildWellbeing, onEachFeature: onEachFeature});//.addTo(map);
+        //Add pop ups for the polygos
+		c_wellbeing.eachLayer(function (layer) {
+		layer.bindPopup('<b>'+layer.feature.properties.COUNTY+' County'+'</b><br />'
+		+'<b>'+ 'Wellbeing Score: ' + '</b>'+layer.feature.properties.T_score + '<br />'
+		+'<b>'+ 'Wellbeing Index: ' + '</b>'+layer.feature.properties.Wellbeing + ' child friendly'
+		);
+	});
 
 			// add a container to control the layers
-			L.control.layers({"CartoDB": CartoDB, "OpenStreetMap": osm}, {"Local CSO Sites": cso_site, "Safe Shelters": shelters,"World Vision (Kenya)": wvi, "Covid Cases": covid}, {position: 'topleft', collapsed: false}).addTo(map);
+			L.control.layers({"CartoDB": CartoDB, "OpenStreetMap": osm}, {"Local CSO Sites": cso_site, "Safe Shelters": shelters,"World Vision (Kenya)": wvi, "Covid Cases": covid, "Teen Pregnancy": t_pregnancy, "Child wellbeing":c_wellbeing}, {position: 'topleft', collapsed: false}).addTo(map);
 		};
 
 
